@@ -1,0 +1,7 @@
+SELECT a.primaryTitle, a.startYear, b.averageRating FROM a.Production, b.Ratings WHERE startYear IS "     ";
+
+SELECT primaryName, birthYear, deathYear FROM Person WHERE primaryName LIKE "      ";
+
+SELECT a.primaryTitle, a.startYear, b.averageRating, c.seasonNumber, c.episodeNumber FROM a.Production, b.Ratings, c.Episode WHERE primaryTitle IS "     " ... AND seasonNumber IS ..... AND episodeNumber IS "   ";
+
+SELECT a.primaryTitle, a.startYear, b.averageRating FROM a.Production, b.Ratings WHERE primaryTitle IS "    ";

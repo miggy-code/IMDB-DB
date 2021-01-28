@@ -1,0 +1,152 @@
+-- Refresh whole database
+
+DROP DATABASE IF EXISTS IMDB_BlalockPadilla;
+CREATE DATABASE IMDB_BlalockPadilla
+    CHARACTER SET UTF8 COLLATE utf8_general_ci;
+USE IMDB_BlalockPadilla;
+
+-- Create and populate all fully independent tables
+
+CREATE TABLE Region (
+    regionID VARCHAR(6),
+    regionDescription VARCHAR(255),
+    CONSTRAINT PRIMARY KEY(regionID)
+);
+INSERT INTO Region (regionID) (
+    SELECT distinct region FROM IMDB_ORG.Title_AKAs
+    WHERE region IS NOT NULL
+    ORDER BY REGION ASC
+);
+
+CREATE TABLE Language (
+    languageID VARCHAR(6),
+    languageName VARCHAR(255),
+    CONSTRAINT PRIMARY KEY(languageID)
+);
+INSERT INTO Language (languageID) (
+    SELECT language FROM IMDB_ORG.Title_AKAs
+    WHERE language IS NOT NULL
+    GROUP BY language
+);
+
+CREATE TABLE VersionType (
+    versionTypeID VARCHAR(6),
+    versionTypeDescription VARCHAR(255),
+    CONSTRAINT PRIMARY KEY(versionTypeID)
+);
+
+CREATE TABLE Genre (
+    genreID VARCHAR(16),
+    genreDescription VARCHAR(255),
+    CONSTRAINT PRIMARY KEY(genreID)
+);
+
+CREATE TABLE ProductionType ( 
+    typeID varchar(16), 
+    typeDescription varchar(255), 
+    CONSTRAINT PRIMARY KEY (typeID)
+);
+
+CREATE TABLE Job (
+    jobID varchar(24),
+    jobDescription varchar(255),
+    CONSTRAINT PRIMARY KEY (jobID)
+);
+
+-- Create and populate all semi-dependent tables
+
+CREATE TABLE Production ( 
+    prodID varchar(10), 
+    typeID varchar(16), 
+    primaryTitle varchar(512),
+    originalTitle varchar(512),
+    isAdult integer(1),
+    startYear integer(4),
+    endYear integer(4),
+    runTime integer(4),
+    CONSTRAINT PRIMARY KEY (prodID),
+    CONSTRAINT FOREIGN KEY (typeID) REFERENCES ProductionType (typeID)
+);
+
+CREATE TABLE Version (
+    prodID VARCHAR(10),
+    sequence SMALLINT(5),
+    title VARCHAR(1024),
+    regionID VARCHAR(6),
+    languageID VARCHAR(6),
+    isOriginal TINYINT(1),
+    comments VARCHAR(2048),
+    CONSTRAINT FOREIGN KEY (prodID) REFERENCES Production (prodID),
+    CONSTRAINT PRIMARY KEY (sequence)
+);
+
+CREATE TABLE Episode (
+    prodID CHAR(10),
+    seasonNumber INTEGER(10),
+    episodeNumber INTEGER(10),
+    CONSTRAINT FOREIGN KEY (prodID) REFERENCES Production (prodID)
+);
+
+CREATE TABLE Person (
+    personID varchar(10),
+    primaryName varchar(255),
+    birthYear integer(4),
+    deathYear integer(4),
+    CONSTRAINT PRIMARY KEY (personID)
+);
+
+CREATE TABLE Ratings (
+    prodID varchar(10),
+    averageRating numeric(9,2),
+    numVotes integer(10),
+    CONSTRAINT FOREIGN KEY (prodID) REFERENCES Production (prodID)
+);
+
+CREATE TABLE CastAndCrew (
+    prodID varchar(10),
+    personID varchar(10),
+    jobID varchar(24),
+    sequence integer(10),
+    jobTitle varchar(1024),
+    characterPlayed varchar(1024),
+    CONSTRAINT FOREIGN KEY (prodID) REFERENCES Production (prodID),
+    CONSTRAINT FOREIGN KEY (personID) REFERENCES Person (personID),
+    CONSTRAINT FOREIGN KEY (jobID) REFERENCES Job (jobID),
+    CONSTRAINT PRIMARY KEY (sequence)
+);
+
+-- Create and populate all fully dependent tables
+
+CREATE TABLE ProductionVersionType (
+    prodID VARCHAR(10),
+    sequence SMALLINT(5),
+    versionTypeID VARCHAR(6),
+    versionTypeNotes VARCHAR(255),
+    CONSTRAINT FOREIGN KEY (prodID) REFERENCES Version (prodID),
+    CONSTRAINT FOREIGN KEY (sequence) REFERENCES Version (sequence),
+    CONSTRAINT FOREIGN KEY (versionTypeID) REFERENCES VersionType (versionTypeID)
+);
+
+CREATE TABLE ProductionGenre (
+    prodID VARCHAR(10),
+    genreID VARCHAR(10),
+    prodGenreNotes VARCHAR(255),
+    CONSTRAINT FOREIGN KEY (prodID) REFERENCES Production (prodID),
+    CONSTRAINT FOREIGN KEY (genreID) REFERENCES Genre (genreID)
+);
+
+CREATE TABLE PrimaryProfessions (
+    personID varchar(10),
+    jobID varchar(24),
+    professionNotes varchar(255),
+    CONSTRAINT FOREIGN KEY (personID) REFERENCES Person (personID),
+    CONSTRAINT FOREIGN KEY (jobID) REFERENCES Job (jobID)
+);
+
+CREATE TABLE PersonKnownFor (
+    personID varchar(10), 
+    prodID varchar(10),
+    knownForNotes varchar(255),
+    CONSTRAINT FOREIGN KEY (prodID) REFERENCES Production (prodID),
+    CONSTRAINT FOREIGN KEY (personID) REFERENCES Person (personID)
+);

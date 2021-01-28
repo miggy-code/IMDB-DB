@@ -1,0 +1,21 @@
+switch (search by)
+    case(film)
+        List title, year, rating (Year specifiable)
+
+    case(series)
+        switch (scope) (Let's just start with whole series and single episode as scope. I don't think there's ratings for single seasons)
+            case (series)
+                List title, year, rating (Year specifiable)
+                    Sublist for episode
+            case (episode)
+                List title, year, rating, seasonNumber, EpisodeNumber (seasonNumber specifiable, episode number specifiable)
+    Person:
+        List name, birthYear, deathYearetc.
+        
+    Rating:
+        List title, year, rating (year specifiable)
+
+    Year:
+        List title, rating
+        
+    Region: 
